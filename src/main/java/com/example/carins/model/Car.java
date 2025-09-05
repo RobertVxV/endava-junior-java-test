@@ -10,6 +10,7 @@ public class Car {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique=true)
     @NotBlank @Size(min = 5, max = 32)
     private String vin;
 
