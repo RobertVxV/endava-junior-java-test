@@ -27,6 +27,7 @@ curl "http://localhost:8080/api/cars/1/insurance-valid?date=2025-06-01"
 Run tests:
 ```bash
 mvn -q -DskipTests=false test
+mvn test -Dtest=CarInsuranceApplicationTests
 ```
 
 ## 3) Business Description
