@@ -9,4 +9,5 @@ public record InsuranceClaimDto(
         LocalDate claimDate,
         String description,
         BigDecimal amount
-) {}
+) {
+}

@@ -12,4 +12,5 @@ public record CarHistoryEventDto(
         String description,
         BigDecimal amount,
         String provider
-) {}
+) {
+}
