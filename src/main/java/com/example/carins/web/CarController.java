@@ -1,8 +1,11 @@
 package com.example.carins.web;
 
+import com.example.carins.exception.CarNotFoundException;
+import com.example.carins.exception.InvalidInsuranceException;
 import com.example.carins.model.Car;
 import com.example.carins.model.InsuranceClaim;
 import com.example.carins.service.CarService;
+import com.example.carins.web.utilities.DateValidator;
 import com.example.carins.web.dto.CarDto;
 import com.example.carins.web.dto.CarHistoryEventDto;
 import com.example.carins.web.dto.InsuranceClaimDto;
@@ -15,7 +18,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
 import java.util.List;
 
 @RestController
@@ -24,8 +26,11 @@ public class CarController {
 
     private final CarService service;
 
-    public CarController(CarService service) {
+    private final DateValidator dateValidator;
+
+    public CarController(CarService service, DateValidator dateValidator) {
         this.service = service;
+        this.dateValidator = dateValidator;
     }
 
     @GetMapping("/cars")
@@ -35,24 +40,19 @@ public class CarController {
 
     @GetMapping("/cars/{carId}/insurance-valid")
     public ResponseEntity<?> isInsuranceValid(@PathVariable Long carId, @RequestParam String date) {
-        // TODO: validate date format and handle errors consistently
-        try{
-            LocalDate d = LocalDate.parse(date);
-            boolean valid = service.isInsuranceValid(carId, d);
-            return ResponseEntity.ok(new InsuranceValidityResponse(carId, d.toString(), valid));
-        } catch (DateTimeParseException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid date format. Use YYYY-MM-DD");
+        LocalDate parsedDate = dateValidator.validateAndParse(date);
+        boolean valid = false;
+        try {
+            valid = service.isInsuranceValid(carId, parsedDate);
+        } catch (CarNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
+        return ResponseEntity.ok(new InsuranceValidityResponse(carId, parsedDate.toString(), valid));
     }
 
     @PostMapping("/cars/{carId}/claims")
     public ResponseEntity<?> claimCar(@PathVariable Long carId, @RequestParam String claimDate, @RequestParam String description, @RequestParam String amount) {
-        LocalDate parsedClaimDate;
-        try {
-            parsedClaimDate = LocalDate.parse(claimDate);
-        } catch (DateTimeParseException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid date format. Use YYYY-MM-DD");
-        }
+        LocalDate parsedClaimDate = dateValidator.validateAndParse(claimDate);
         if (description == null || description.trim().length() < 10) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Description is required and must be at least 10 characters");
@@ -74,7 +74,12 @@ public class CarController {
                     "Invalid amount format. Use decimal number (e.g., 123.45)");
         }
 
-        InsuranceClaim claim = service.registerClaim(carId, parsedClaimDate, description.trim(), parsedAmount);
+        InsuranceClaim claim;
+        try {
+            claim = service.registerClaim(carId, parsedClaimDate, description.trim(), parsedAmount);
+        } catch (CarNotFoundException | InvalidInsuranceException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
 
         InsuranceClaimDto claimDto = toClaimDto(claim);
 
@@ -111,6 +116,9 @@ public class CarController {
         return service.getCarHistory(carId);
     }
 
-    public record InsuranceValidityResponse(Long carId, String date, boolean valid) {}
-    public record InsuranceClaimResponse(Long carId, LocalDate claimDate, String description, BigDecimal amount) {}
+    public record InsuranceValidityResponse(Long carId, String date, boolean valid) {
+    }
+
+    public record InsuranceClaimResponse(Long carId, LocalDate claimDate, String description, BigDecimal amount) {
+    }
 }
