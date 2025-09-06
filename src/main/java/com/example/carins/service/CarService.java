@@ -1,5 +1,8 @@
 package com.example.carins.service;
 
+import com.example.carins.exception.CarNotFoundException;
+import com.example.carins.exception.DuplicateVinException;
+import com.example.carins.exception.InvalidInsuranceException;
 import com.example.carins.model.Car;
 import com.example.carins.model.InsuranceClaim;
 import com.example.carins.model.InsurancePolicy;
@@ -37,30 +40,29 @@ public class CarService {
 
     public boolean isInsuranceValid(Long carId, LocalDate date) {
         if (carId == null || date == null) return false;
-        // TODO: optionally throw NotFound if car does not exist
         if (carRepository.findById(carId).isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Car not found with id: " + carId);
+            throw new CarNotFoundException(carId);
         }
         return policyRepository.existsActiveOnDate(carId, date);
     }
 
     public Car saveCar(Car car) {
         if (carRepository.findByVin(car.getVin()).isPresent()) {
-            throw new IllegalArgumentException("VIN already exists: " + car.getVin());
+            throw new DuplicateVinException(car.getVin());
         }
         return carRepository.save(car);
     }
 
     public InsuranceClaim registerClaim(Long carId, LocalDate claimDate, String description, BigDecimal amount) {
+
         Optional<Car> carOpt = carRepository.findById(carId);
         if (carOpt.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Car not found with id: " + carId);
+            throw new CarNotFoundException(carId);
         }
 
         boolean valid = this.isInsuranceValid(carId, claimDate);
         if (!valid) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "No active insurance policy found for car on claim date: " + claimDate);
+            throw new InvalidInsuranceException(carId, claimDate);
         }
 
         Car car = carOpt.get();
@@ -70,7 +72,7 @@ public class CarService {
 
     public List<CarHistoryEventDto> getCarHistory(Long carId) {
         if (carRepository.findById(carId).isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Car not found with id: " + carId);
+            throw new CarNotFoundException(carId);
         }
 
         List<CarHistoryEventDto> events = new ArrayList<>();
