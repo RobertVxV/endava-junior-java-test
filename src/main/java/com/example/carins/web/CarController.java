@@ -4,6 +4,7 @@ import com.example.carins.model.Car;
 import com.example.carins.model.InsuranceClaim;
 import com.example.carins.service.CarService;
 import com.example.carins.web.dto.CarDto;
+import com.example.carins.web.dto.CarHistoryEventDto;
 import com.example.carins.web.dto.InsuranceClaimDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -103,6 +104,11 @@ public class CarController {
                 claim.getDescription(),
                 claim.getAmount()
         );
+    }
+
+    @GetMapping("/cars/{carId}/history")
+    public List<CarHistoryEventDto> getCarHistory(@PathVariable Long carId) {
+        return service.getCarHistory(carId);
     }
 
     public record InsuranceValidityResponse(Long carId, String date, boolean valid) {}
