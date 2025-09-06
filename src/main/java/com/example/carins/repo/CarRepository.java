@@ -14,4 +14,5 @@ public interface CarRepository extends JpaRepository<Car, Long> {
     @EntityGraph(attributePaths = {"owner"})
     List<Car> findAll();
     Optional<Car> findByVin(String vin);
+    Optional<Car> findById(Long id);
 }
