@@ -119,7 +119,7 @@ public class CarService {
             ));
         }
 
-        events.sort(Comparator.comparing(CarHistoryEventDto::date));
+        events.sort(Comparator.comparing(CarHistoryEventDto::date).reversed());
 
         return events;
     }
