@@ -10,7 +10,8 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "insuranceclaim")
 public class InsuranceClaim {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
@@ -26,7 +27,8 @@ public class InsuranceClaim {
     @Column(nullable = false)
     private LocalDate claimDate;
 
-    public InsuranceClaim() {}
+    public InsuranceClaim() {
+    }
 
     public InsuranceClaim(Car car, LocalDate claimDate, String description, BigDecimal amount) {
         this.car = car;
@@ -35,15 +37,44 @@ public class InsuranceClaim {
         this.amount = amount;
     }
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-    public Car getCar() { return car; }
-    public void setCar(Car car) { this.car = car; }
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
-    public BigDecimal getAmount() { return amount; }
-    public void setAmount(BigDecimal amount) { this.amount = amount; }
-    public LocalDate getClaimDate() { return claimDate; }
-    public void setClaimDate(LocalDate claimDate) { this.claimDate = claimDate; }
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Car getCar() {
+        return car;
+    }
+
+    public void setCar(Car car) {
+        this.car = car;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
+    }
+
+    public LocalDate getClaimDate() {
+        return claimDate;
+    }
+
+    public void setClaimDate(LocalDate claimDate) {
+        this.claimDate = claimDate;
+    }
 
 }

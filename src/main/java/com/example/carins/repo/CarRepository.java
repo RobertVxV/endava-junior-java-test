@@ -13,6 +13,8 @@ public interface CarRepository extends JpaRepository<Car, Long> {
     // TODO: enforce unique VIN at DB and via validation (exercise)
     @EntityGraph(attributePaths = {"owner"})
     List<Car> findAll();
+
     Optional<Car> findByVin(String vin);
+
     Optional<Car> findById(Long id);
 }
