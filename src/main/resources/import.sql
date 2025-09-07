@@ -9,5 +9,5 @@ INSERT INTO insurancepolicy (id, car_id, provider, start_date, end_date) VALUES 
 INSERT INTO insurancepolicy (id, car_id, provider, start_date, end_date) VALUES (3, 2, 'Allianz', DATE '2025-03-01', DATE '2025-09-30');
 
 INSERT INTO insuranceclaim (car_id, claim_date, description, amount) VALUES (1, DATE '2024-05-15', 'Minor collision with another vehicle in parking lot. Damage to rear bumper and taillight.', 850.50);
-INSERT INTO insuranceclaim (car_id, claim_date, description, amount) VALUES (1, DATE '2024-08-22', 'Windshield replacement due to stone chip damage while driving on highway.', 325.00);
+INSERT INTO insuranceclaim (car_id, claim_date, description, amount) VALUES (1, DATE '2025-08-22', 'Windshield replacement due to stone chip damage while driving on highway.', 325.00);
 INSERT INTO insuranceclaim (car_id, claim_date, description, amount) VALUES (2, DATE '2025-07-10', 'Side mirror damage from vandalism while parked overnight in residential area.', 180.75);
